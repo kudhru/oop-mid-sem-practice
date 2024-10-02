@@ -1,8 +1,8 @@
 import java.util.*;
 
 abstract class Person {
-    protected String name;
-    protected final int id;
+    private String name;
+    private final int id;
 
     public Person(String name, int id) {
         this.name = name;
@@ -12,11 +12,11 @@ abstract class Person {
     public abstract void displayDetails();
 
     public String getName() {
-        /* Write Code here */
+        return name;
     }
 
     public int getId() {
-        /* Write Code here */
+        return id;
     }
 }
 
@@ -49,12 +49,16 @@ class Student extends Person {
 
     @Override
     public String toString() {
-        return "Student [name=" + name + ", id=" + id + ", courses=" + courses + "]";
+        return "Student [name=" + this.getName() + ", id=" + this.getId() + ", courses=" + courses + "]";
     }
 
     public List<String> getCourses() {
         List<String> courses = new ArrayList<>(this.courses);
         return courses;
+    }
+
+    public void removeCourse(String course) {
+        this.courses.remove(course);
     }
 
     public static int getTotalStudents() {
@@ -63,12 +67,15 @@ class Student extends Person {
 
     @Override
     public boolean equals(Object obj) {
-        /* Write Code here */
+        Student student = (Student) obj;
+        return this.getName().equals(student.getName()) &&
+                this.getId() == student.getId() && this.getCourses().size() == student.getCourses().size();
     }
 
     @Override
     public int hashCode() {
-        /* Write Code here */
+//        return Objects.hash(this.getName(), this.getId(), this.getCourses());
+        return Objects.hash(this.getName(), this.getId(), this.getCourses().size());
     }
 }
 
@@ -76,30 +83,41 @@ class Teacher extends Person {
     private Set<String> courses;
     private static final String SCHOOL_NAME = "Green Valley High School";
 
-    public Teacher(/* Write Code here */) {
-        /* Write Code here */
+    public Teacher(String name, int id) {
+        super(name, id);
+        courses = new HashSet<>();
     }
 
     public void addCourse(String course) {
-        /* Write Code here */
+//        if (!courses.contains(course))
+        courses.add(course);
     }
 
     public boolean teachesCourse(String course) {
-        /* Write Code here */
+        return courses.contains(course);
     }
 
+    public String toString() {
+        return "Teacher [name=" + this.getName() + ", id=" + this.getId() + ", courses=" + courses + "]";
+    }
     @Override
     public void displayDetails() {
-        /* Write Code here */
+        System.out.println(toString());
     }
 
     public Set<String> getCourses() {
-        /* Write Code here */
+        Set<String> courses = new HashSet<>(this.courses);
+        return courses;
     }
 
     @Override
     public boolean equals(Object obj) {
-        /* Write Code here */
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Teacher teacher = (Teacher) obj;
+        return getId() == teacher.getId() &&
+                getName().equals(teacher.getName()) && courses.equals(teacher.courses);
+
     }
 
     @Override
@@ -119,21 +137,54 @@ class Classroom implements ClassManagement {
     private Teacher teacher;
 
     public Classroom(Teacher teacher) {
-        /* Write Code here */
+        this.teacher = teacher;
+        this.students = new HashMap<>();
     }
 
     @Override
     public void assignStudentToClass(Student student) {
-        /* Write Code here */
+        students.put(student.getId(), student);
     }
 
     @Override
     public List<Student> getClassStudents() {
-        /* Write Code here */
+        List<Student> studentList = new ArrayList<>(students.values());
+        return studentList;
     }
 
     public void displayClassInfo() {
         /* Write Code here */
+    }
+}
+
+class CourseDetails {
+    private String courseName;
+    private Teacher teacher;
+    private List<Student> students;
+
+    CourseDetails(String courseName, Teacher teacher) {
+        this.courseName = courseName;
+        this.teacher = teacher;
+        this.students = new ArrayList<>();
+    }
+
+    CourseDetails(String courseName, Teacher teacher, List<Student> students) {
+        this.courseName = courseName;
+        this.teacher = teacher;
+        this.students = students;
+    }
+
+    public void addStudents(Student student) {
+        if (!students.contains(student))
+            students.add(student);
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 }
 
@@ -142,33 +193,78 @@ class School {
     private List<Teacher> teachers;
     private List<Classroom> classrooms;
     private Set<String> courses;
-    Double xyz;
-    public School(/* Write Code here */) {
-        /* Write Code here */
+    public School() {
+        students = new ArrayList<>();
+        teachers = new ArrayList<>();
+        classrooms = new ArrayList<>();
+        courses = new HashSet<>();
     }
 
     public void addStudent(Student student) {
-        /* Write Code here */
+        if(!students.contains(student)) {
+            students.add(student);
+        }
     }
 
     public void addTeacher(Teacher teacher) {
-        /* Write Code here */
+        if(!teachers.contains(teacher)) {
+            teachers.add(teacher);
+        }
     }
 
     public void addClassroom(Classroom classroom) {
-        /* Write Code here */
+        if(!classrooms.contains(classroom)) {
+            classrooms.add(classroom);
+        }
     }
 
     public void addCourse(String course) {
-        /* Write Code here */
+        courses.add(course);
     }
 
-    public Map<String, Map<String, Object>> generateCourseMapping() {
-        Map<String, Map<String, Object>> courseMapping = new HashMap<>();
+    public Set<CourseDetails> generateCourseMapping() {
+        // let us say there are 15 students in a class
+        // there are 4 teachers who are teaching them.
+        // each teacher is teaching 2 subjects.
+        // Assume that a subject is only taught by
+        // for a course,
+        // 1. who is the teacher teaching it?
+        // 2. who are the students who are taking that course?
+        Set<CourseDetails> courseDetailsSet = new HashSet<>();
+        // Student class gives us students registered in a course
+        // Teacher class gives us courses taught by a teacher
 
-        /* Write Code here */
+        // Let us use the teachers list to initialize the courseMappings
+        Iterator<Teacher> teacherIterator = teachers.iterator();
+        while (teacherIterator.hasNext()) {
+            Teacher teacher = teacherIterator.next();
+            Set<String> courses = teacher.getCourses();
+            Iterator<String> courseIterator = courses.iterator();
+            while (courseIterator.hasNext()) {
+                String course = courseIterator.next();
+                CourseDetails courseDetails = new CourseDetails(course, teacher);
+                courseDetailsSet.add(courseDetails);
+            }
+        }
 
-        return courseMapping;
+        Iterator<Student> studentIterator = students.iterator();
+        while (studentIterator.hasNext()) {
+            Student student = studentIterator.next();
+            List<String> courses = student.getCourses();
+            Iterator<String> courseIterator = courses.iterator();
+            while (courseIterator.hasNext()) {
+                String course = courseIterator.next();
+                // search the courseDetails object from the courseDetailsSet
+                Iterator<CourseDetails> courseDetailsIterator = courseDetailsSet.iterator();
+                while (courseDetailsIterator.hasNext()) {
+                    CourseDetails courseDetails = courseDetailsIterator.next();
+                    if(courseDetails.getCourseName().equals(course)) {
+                        courseDetails.addStudents(student);
+                    }
+                }
+            }
+        }
+        return courseDetailsSet;
     }
 
     public void displaySchoolDetails() {
@@ -177,22 +273,62 @@ class School {
 
     public List<Teacher> findTeachersByCourse(String course) {
         List<Teacher> courseTeachers = new ArrayList<>();
-        /* Write Code here */
+        Iterator<Teacher> teacherIterator = teachers.iterator();
+        while (teacherIterator.hasNext()) {
+            Teacher teacher = teacherIterator.next();
+            if(teacher.getCourses().contains(course)) {
+                courseTeachers.add(teacher);
+            }
+        }
         return courseTeachers;
     }
 
     public List<Student> findStudentsByTeacher(String teacherName) {
         List<Student> studentsOfTeacher = new ArrayList<>();
-        /* Write Code here */
+        // first get the list of courses taught by this teacher.
+        Teacher teacher = null;
+        for (int i = 0; i < teachers.size(); i++) {
+            teacher = teachers.get(i);
+            if(teacher.getName().equals(teacherName)) {
+                break;
+            }
+        }
+        Set<String> courses = teacher.getCourses();
+        for (int i = 0; i < students.size(); i++) {
+            Student student = students.get(i);
+            List<String> studentCourses = student.getCourses();
+            for (int j = 0; j < studentCourses.size(); j++) {
+                String studentCourse = studentCourses.get(j);
+                if(courses.contains(studentCourse)) {
+                    studentsOfTeacher.add(student);
+                    break;
+                }
+            }
+        }
+
         return studentsOfTeacher;
     }
 
     public void updateStudentCourses(int studentId, List<String> newCourses) {
-        /* Write Code here */
+        Student student = null;
+        for (int i = 0; i < this.students.size(); i++) {
+            student = this.students.get(i);
+            if(student.getId() == studentId) {
+                break;
+            }
+        }
+        List<String> oldCourses = student.getCourses();
+        for (int i = 0; i < oldCourses.size(); i++) {
+            student.removeCourse(oldCourses.get(i));
+        }
+
+        for (int i = 0; i < newCourses.size(); i++) {
+            student.addCourse(newCourses.get(i));
+        }
     }
 
     public void reassignTeacherCourse(String course, Teacher newTeacher) {
-        /* Write Code here */
+
     }
 
     public boolean compareEntities(Person p1, Person p2) {
