@@ -20,7 +20,7 @@ abstract class Person {
     }
 }
 
-class Student extends Person {
+class Student extends CustomPerson {
     private List<String> courses;
     private static int totalStudents = 0;
 
@@ -79,7 +79,7 @@ class Student extends Person {
     }
 }
 
-class Teacher extends Person {
+class Teacher extends CustomPerson {
     private Set<String> courses;
     private static final String SCHOOL_NAME = "Green Valley High School";
 
@@ -331,7 +331,7 @@ class School {
 
     }
 
-    public boolean compareEntities(Person p1, Person p2) {
+    public boolean compareEntities(CustomPerson p1, CustomPerson p2) {
         /* Write Code here */
     }
 }
