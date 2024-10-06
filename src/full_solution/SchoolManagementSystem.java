@@ -100,7 +100,9 @@ class Teacher extends Person {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Teacher teacher = (Teacher) obj;
-        return id == teacher.id && Objects.equals(name, teacher.name) && Objects.equals(courses, teacher.courses);
+//        return id == teacher.id && Objects.equals(name, teacher.name) && Objects.equals(courses, teacher.courses);
+        return id == teacher.id &&
+                name.equals(teacher.name) && courses.equals(teacher.courses);
     }
 
     @Override
