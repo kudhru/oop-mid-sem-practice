@@ -82,29 +82,42 @@ public class GroupMessagingSystem {
     public User.UserStatistics getUserStatistics() {
         // Use lamda expressions to return an implementation of UserStatistics that
         // counts user messages
+        // [2 mark] for correct declaration of interface reference type
         User.UserStatistics userStatistics = (
+                // [2 marks] for correct input arguments (syntax) of lambda expression
                 (user, groupName) -> {
-            int userMessageCount = 0;
-            List<String> messages = groupMessages.get(groupName);
-            for(String message : messages) {
-                if(message.contains(user.getUserName()))
-                    userMessageCount++;
-            }
-            return userMessageCount;
-        });
+                    // [1 marks] for correct initialization of count
+                    int userMessageCount = 0;
+                    // [2 marks] for correct retrieval of messages
+                    List<String> messages = groupMessages.get(groupName);
+                    // [2 marks] for correct for loop statement
+                    for(String message : messages) {
+                        // [2 marks] for correct if statement
+                        if(message.contains(user.getUserName()))
+                            // [2 marks] for correct update to count
+                            userMessageCount++;
+                    }
+                    // [1 marks] for correct return statement of the lambda expression
+                    return userMessageCount;
+                });
+        // [1 marks] for correct return statement
         return userStatistics;
     }
 
     // Q.7 WRITE CODE FOR THIS METHOD TO COMPUTE THE AVERAGE NUMBER OF MESSAGES PER USER IN A GROUP   [05 M]
     public double getAverageMessagesPerUser(String groupName) {
         // Return 0.0 if the group doesn't exist
+        // [1 mark] for correct if statement and return 0.0
         if(!groupMessages.containsKey(groupName) || !groupUsers.containsKey(groupName)) {
             return 0.0;
         }
         // Calculate total messages and total users in the group
+        // [1 mark] for correct retrieval of totalMessages
         double totalMessages = groupMessages.get(groupName).size();
+        // [1 mark] for correct retrieval of totalUsers
         double totalUsers = groupUsers.get(groupName).size();
         // Return the average number of messages per user
+        // [2 marks] for correct computation of average
         return totalMessages / totalUsers;
     }
 
