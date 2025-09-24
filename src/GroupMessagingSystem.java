@@ -1,3 +1,5 @@
+// Question Paper is available here: https://tinyurl.com/m24-oop-mid-sem-qp
+
 import java.util.*;
 
 // The GroupMessagingSystem class manages messaging and user statistics in groups
